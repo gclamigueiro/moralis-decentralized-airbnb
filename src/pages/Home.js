@@ -3,10 +3,17 @@ import "./Home.css";
 import { Link } from "react-router-dom";
 import bg from "../images/frontpagebg.png"
 import logo from "../images/airbnb.png"
-import { ConnectButton, Select, DatePicker, Input, Icon } from "web3uikit";
+import { ConnectButton, Select, DatePicker, Input, Icon, Button } from "web3uikit";
 import SearchInput from "./../components/SearchInput";
 
+import { useState } from "react";
+
 const Home = () => {
+
+  const [destination, setDestination] = useState("");
+  const [checkIn, setCheckIn] = useState(new Date());
+  const [checkOut, setCheckOut] = useState(new Date());
+  const [guests, setGuests] = useState(2);
 
   return (
     <>
@@ -31,7 +38,8 @@ const Home = () => {
 
           <SearchInput text={'Location'}>
             <Select defaultOptionIndex={0}
-              onChange={(data) => console.log(data.label)}
+              onChange={(data) => setDestination(data.id)}
+              value={destination}
               options={[
                 { id: "ny", label: "New York" },
                 { id: "sf", label: "San Francisco" },
@@ -41,28 +49,43 @@ const Home = () => {
           <SearchInput text={'Check In'}>
             <DatePicker
               id="checkin"
-              onChange={(data) => console.log(data.date)} />
+              value={checkIn}
+              onChange={(data) => setCheckIn(data.date)} />
           </SearchInput>
 
           <SearchInput text={'Check Out'}>
             <DatePicker
               id="checkout"
-              onChange={(data) => console.log(data.date)} />
+              value={checkOut}
+              onChange={(data) => setCheckOut(data.date)} />
           </SearchInput>
 
           <SearchInput text={'Guests'}>
             <Input
-              value={2}
+              value={guests}
               name="AddGuests"
               type="number"
-              onChange={(event) => console.log(event.target)} />
+              onChange={(event) => setGuests(Number(event.target))} />
           </SearchInput>
-
-          <div className="searchButton" >
-            <Icon fill="#ffffff" size={24} svg="search"/>
-          </div>
+          <Link to={'/rentals'} state={{
+            destination, checkIn, checkOut, guests
+          }}>
+            <div className="searchButton" >
+              <Icon fill="#ffffff" size={24} svg="search" />
+            </div>
+          </Link>
 
         </div>
+      </div>
+      <div className="randomLocation">
+        <div className="title">Feel Adventoruous  </div>
+        <div className="text">
+          Let us decide and discover new places
+          to stay, live, work or just relax
+        </div>
+        <Button text="Explore A Location"
+          onClick={() => { console.log(checkOut) }}
+        />
       </div>
 
     </>
