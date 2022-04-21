@@ -10,7 +10,7 @@ import { useState } from "react";
 
 const Home = () => {
 
-  const [destination, setDestination] = useState("");
+  const [destination, setDestination] = useState("New York");
   const [checkIn, setCheckIn] = useState(new Date());
   const [checkOut, setCheckOut] = useState(new Date());
   const [guests, setGuests] = useState(2);
@@ -38,7 +38,7 @@ const Home = () => {
 
           <SearchInput text={'Location'}>
             <Select defaultOptionIndex={0}
-              onChange={(data) => setDestination(data.id)}
+              onChange={(data) => setDestination(data.label)}
               value={destination}
               options={[
                 { id: "ny", label: "New York" },
