@@ -12,7 +12,7 @@ const Home = () => {
 
   const [destination, setDestination] = useState("New York");
   const [checkIn, setCheckIn] = useState(new Date());
-  const [checkOut, setCheckOut] = useState(new Date());
+  const [checkOut, setCheckOut] = useState(new Date(Date.now() + (3600 * 1000 * 24)));
   const [guests, setGuests] = useState(2);
 
   return (
@@ -42,21 +42,20 @@ const Home = () => {
               value={destination}
               options={[
                 { id: "New York", label: "New York" },
-                { id: "San Francisco", label: "San Francisco" },
+                { id: "London", label: "London" },
               ]} />
           </SearchInput>
 
           <SearchInput text={'Check In'}>
             <DatePicker
               id="checkin"
-              value={checkIn}
               onChange={(data) => setCheckIn(data.date)} />
           </SearchInput>
 
           <SearchInput text={'Check Out'}>
             <DatePicker
               id="checkout"
-              value={checkOut}
+              value={checkOut.toISOString().substring(0, 10)}
               onChange={(data) => setCheckOut(data.date)} />
           </SearchInput>
 

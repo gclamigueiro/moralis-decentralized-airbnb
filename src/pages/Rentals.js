@@ -1,38 +1,140 @@
 import React from "react";
 import "./Rentals.css";
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../images/airbnbRed.png"
 
-import { ConnectButton, Icon, Button } from "web3uikit";
-import { useState } from "react";
+import { ConnectButton, Icon, Button, useNotification } from "web3uikit";
+import { useState, useEffect } from "react";
 import RentalsMap from "./../components/RentalsMap";
+import User from "./../components/User";
+import { useMoralis, useWeb3ExecuteFunction } from 'react-moralis'
 
 const Rentals = () => {
 
-  const { state: searchFilters } = useLocation();
+  let navigate = useNavigate();
+  let { state: searchFilters } = useLocation();
+
   const [highLight, setHighLight] = useState();
 
-  const rentalsList = [
-    {
-      attributes: {
-        city: "New York",
-        unoDescription: "3 Guests • 2 Beds • 2 Rooms",
-        dosDescription: "Wifi • Kitchen • Living Area",
-        imgUrl:
-          "https://ipfs.moralis.io:2053/ipfs/QmS3gdXVcjM72JSGH82ZEvu4D7nS6sYhbi5YyCw8u8z4pE/media/3",
-        lat: "40.716862",
-        long: "-73.999005",
-        name: "Apartment in China Town",
-        pricePerDay: "3",
-      },
-    },
-  ];
+  const { Moralis, account } = useMoralis();
+  const contractProcessor = useWeb3ExecuteFunction();
+  const dispatch = useNotification();
 
-  let cords = []
-  rentalsList.forEach(rental => {
-    cords.push({ lat: rental.attributes.lat, lng: rental.attributes.long })
-  })
+  const [rentalsList, setRentalsList] = useState();
+  const [coOrdinates, setCoOrdinates] = useState();
+
+
+  useEffect(() => {
+
+    async function fetchRentalsList() {
+
+      if (!searchFilters)
+        return
+
+      const Rentals = Moralis.Object.extend("Rentals");
+      const query = new Moralis.Query(Rentals);
+      query.equalTo("city", searchFilters.destination);
+      query.greaterThanOrEqualTo("maxGuests_decimal", Number(searchFilters.guests));
+
+      const result = await query.find();
+      console.log(searchFilters, result);
+      let cords = [];
+      result.forEach((e) => {
+        cords.push({ lat: e.attributes.lat, lng: e.attributes.long });
+      });
+
+      setCoOrdinates(cords);
+      setRentalsList(result);
+    }
+
+    if (searchFilters == null) {
+      navigate("/");
+    }
+
+    fetchRentalsList();
+  }, [searchFilters]);
+
+  const handleSuccess = () => {
+    dispatch({
+      type: "success",
+      message: `Nice! You are going to ${searchFilters.destination}!!`,
+      title: "Booking Succesful",
+      position: "topL",
+    });
+  };
+
+  const handleError = (msg) => {
+    dispatch({
+      type: "error",
+      message: `${msg}`,
+      title: "Booking Failed",
+      position: "topL",
+    });
+  };
+
+  const handleNoAccount = () => {
+    dispatch({
+      type: "error",
+      message: `You need to connect your wallet to book a rental`,
+      title: "Not Connected",
+      position: "topL",
+    });
+  }
+
+  const bookRental = async function (start, end, id, dayPrice) {
+    for (
+      var arr = [], dt = new Date(start);
+      dt <= end;
+      dt.setDate(dt.getDate() + 1)
+    ) {
+      arr.push(new Date(dt).toISOString().slice(0, 10)); // yyyy-mm-dd
+    }
+
+    let options = {
+      contractAddress: "0xdaD0Bbb39676188a402664b28418Dc66be308326",
+      functionName: "addDatesBooked",
+      abi: [
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string[]",
+              "name": "newBookings",
+              "type": "string[]"
+            }
+          ],
+          "name": "addDatesBooked",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        }
+      ],
+      params: {
+        id: id,
+        newBookings: arr,
+      },
+      msgValue: Moralis.Units.ETH(dayPrice * arr.length),
+    }
+    console.log(arr);
+
+    await contractProcessor.fetch({
+      params: options,
+      onSuccess: () => {
+        handleSuccess();
+      },
+      onError: (error) => {
+        if (error.data)
+          handleError(error.data.message);
+        else
+          handleError(error?.message)
+      }
+    });
+
+  }
 
   return (
     <>
@@ -42,29 +144,33 @@ const Rentals = () => {
             <img className="logo" src={logo} alt="logo" />
           </Link>
         </div>
-        <div className="searchReminder">
+        {searchFilters && (
+          <div className="searchReminder">
+            <div className="filter">
+              {searchFilters.destination}
+            </div>
+            <div className="vl"></div>
 
-          <div className="filter">
-            {searchFilters.destination}
+            <div className="filter">
+              {`${searchFilters.checkIn.toLocaleString("default", { month: "short" })} 
+                    ${searchFilters.checkIn.toLocaleString("default", { day: "2-digit" })} 
+                    -
+                    ${searchFilters.checkOut.toLocaleString("default", { month: "short" })} 
+                    ${searchFilters.checkOut.toLocaleString("default", { day: "2-digit" })}`}
+            </div>
+            <div className="vl"></div>
+            <div className="guest">
+              {searchFilters.guests} guests
+            </div>
+            <div className="searchFiltersIcon" >
+              <Icon fill="#ffffff" size={24} svg="search" />
+            </div>
           </div>
-          <div className="vl"></div>
-
-          <div className="filter">
-            {`${searchFilters.checkIn.toLocaleString("default", { month: "short" })} 
-            ${searchFilters.checkIn.toLocaleString("default", { day: "2-digit" })} 
-            -
-            ${searchFilters.checkOut.toLocaleString("default", { month: "short" })} 
-            ${searchFilters.checkOut.toLocaleString("default", { day: "2-digit" })}`}
-          </div>
-          <div className="vl"></div>
-          <div className="guest">
-            {searchFilters.guests} guests
-          </div>
-          <div className="searchFiltersIcon" >
-            <Icon fill="#ffffff" size={24} svg="search" />
-          </div>
-        </div>
+        )}
         <div className="lrContainers">
+          {account &&
+            <User account={account} />
+          }
           <ConnectButton />
         </div>
       </div>
@@ -78,7 +184,7 @@ const Rentals = () => {
               return (
                 <div key={e.attributes.name}>
                   <hr className="line2" />
-                  <div  className={highLight == i ? "rentalDivH " : "rentalDiv"}>
+                  <div className={highLight == i ? "rentalDivH " : "rentalDiv"}>
                     <img className="rentalImg" src={e.attributes.imgUrl}></img>
                     <div className="rentalInfo">
                       <div className="rentalTitle">{e.attributes.name}</div>
@@ -90,7 +196,18 @@ const Rentals = () => {
                       </div>
                       <div className="bottomButton">
                         <Button
-                          onClick={() => { }
+                          onClick={() => {
+                            if (account) {
+                              bookRental(
+                                searchFilters.checkIn,
+                                searchFilters.checkOut,
+                                e.attributes.uid_decimal.value.$numberDecimal,
+                                Number(e.attributes.pricePerDay_decimal.value.$numberDecimal)
+                              )
+                            } else {
+                              handleNoAccount()
+                            }
+                          }
                           }
                           text="Stay Here" />
                         <div className="price">
@@ -105,7 +222,8 @@ const Rentals = () => {
             })}
         </div>
         <div className="rentalsContentR">
-          <RentalsMap key={"map"} locations={cords} setHighLight={setHighLight} />
+          {coOrdinates &&
+            (<RentalsMap key={"map"} locations={coOrdinates} setHighLight={setHighLight} />)}
         </div>
       </div>
 
