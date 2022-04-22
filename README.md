@@ -13,8 +13,9 @@ https://moralis.io/moralis-projects-learn-to-build-a-web3-airbnb-clone/
 
 ## How to run the project locally
 
-- Clone this repo
-- install dependencies with `npm install` or `yarn`
+- Clone the repo
+- Install dependencies with `npm install` or `yarn`
 
 ## Demo
 
+<https://moralis-decentralized-airbnb.netlify.app/>

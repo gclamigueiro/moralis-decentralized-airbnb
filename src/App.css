@@ -1,5 +1,5 @@
 /* DatePicker and Input <div> */
-.sc-jQHtVU {
+.sc-jQHtVU, .sc-ezbkAF {
     outline: 0px !important;
     padding-left: 0px !important;
     padding-top: 3px !important;
@@ -7,7 +7,7 @@
 }
 
 /* Select inner <div> */
-.sc-yeoIj {
+.sc-yeoIj, .sc-caiLqq {
     border: 0px !important;
     padding-left: 0px !important;
     padding-top: 3px !important;
@@ -17,17 +17,17 @@
 }
 
 /* Select outer <div> */
-.sc-eGAhfa {
+.sc-eGAhfa, .sc-cCcXHH {
     width: 170px !important;
 }
 
 /* DatePicker and Input <input> */
-.sc-fctJkW {
+.sc-fctJkW, .sc-kLwhqv {
     height:26px !important;
     font-size:14px !important;
 }
 
 /* DatePicker <span> */
-.sc-jTYCaT {
+.sc-jTYCaT, .sc-giYglK {
     height: 70% !important;
 }
