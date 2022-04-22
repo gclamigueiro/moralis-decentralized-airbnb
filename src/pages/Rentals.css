@@ -41,10 +41,10 @@
 }
 
 .rentalsContentL {
-    width: 50%;
+    width: calc(50% - 70px);
     padding:30px;
     height: calc(100vh - 150px);
-    overflow: scroll;
+    overflow-y: scroll;
 }
 
 .rentalsContentR {
