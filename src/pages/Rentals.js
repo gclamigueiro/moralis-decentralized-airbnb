@@ -4,12 +4,14 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import logo from "../images/airbnbRed.png"
 
-import { ConnectButton, Icon, Button} from "web3uikit";
-
+import { ConnectButton, Icon, Button } from "web3uikit";
+import { useState } from "react";
+import RentalsMap from "./../components/RentalsMap";
 
 const Rentals = () => {
 
   const { state: searchFilters } = useLocation();
+  const [highLight, setHighLight] = useState();
 
   const rentalsList = [
     {
@@ -26,6 +28,11 @@ const Rentals = () => {
       },
     },
   ];
+
+  let cords = []
+  rentalsList.forEach(rental => {
+    cords.push({ lat: rental.attributes.lat, lng: rental.attributes.long })
+  })
 
   return (
     <>
@@ -69,9 +76,9 @@ const Rentals = () => {
           {rentalsList &&
             rentalsList.map((e, i) => {
               return (
-                <>
+                <div key={e.attributes.name}>
                   <hr className="line2" />
-                  <div className="rentalDiv">
+                  <div  className={highLight == i ? "rentalDivH " : "rentalDiv"}>
                     <img className="rentalImg" src={e.attributes.imgUrl}></img>
                     <div className="rentalInfo">
                       <div className="rentalTitle">{e.attributes.name}</div>
@@ -83,7 +90,7 @@ const Rentals = () => {
                       </div>
                       <div className="bottomButton">
                         <Button
-                          onClick={() => {}
+                          onClick={() => { }
                           }
                           text="Stay Here" />
                         <div className="price">
@@ -93,9 +100,12 @@ const Rentals = () => {
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
               );
             })}
+        </div>
+        <div className="rentalsContentR">
+          <RentalsMap key={"map"} locations={cords} setHighLight={setHighLight} />
         </div>
       </div>
 

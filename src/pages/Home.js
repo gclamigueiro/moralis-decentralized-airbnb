@@ -41,8 +41,8 @@ const Home = () => {
               onChange={(data) => setDestination(data.label)}
               value={destination}
               options={[
-                { id: "ny", label: "New York" },
-                { id: "sf", label: "San Francisco" },
+                { id: "New York", label: "New York" },
+                { id: "San Francisco", label: "San Francisco" },
               ]} />
           </SearchInput>
 
@@ -65,7 +65,7 @@ const Home = () => {
               value={guests}
               name="AddGuests"
               type="number"
-              onChange={(event) => setGuests(Number(event.target))} />
+              onChange={(event) => setGuests(event.target.value)} />
           </SearchInput>
           <Link to={'/rentals'} state={{
             destination, checkIn, checkOut, guests
