@@ -19,3 +19,5 @@ https://moralis.io/moralis-projects-learn-to-build-a-web3-airbnb-clone/
 ## Demo
 
 <https://moralis-decentralized-airbnb.netlify.app/>
+
+To test the "rent function" you need to have configured Polygon Mumbai Tesnet in your Wallet
